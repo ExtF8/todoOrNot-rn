@@ -12,17 +12,19 @@ export default function TodoRow({
     onDelete: (id: number, projectName: string) => void;
 }) {
     return (
-        <View style={styles.row}>
-            <Pressable
-                onPress={() => onToggle(todo.id, todo.project)}
-                style={[styles.checkbox, todo.compleded && styles.on]}
-                accessibilityRole='checkbox'
-                accessibilityState={{ checked: todo.compleded }}
-            ></Pressable>
-            <View style={{ flex: 1 }}>
-                <Text style={[styles.title, todo.compleded && styles.done]} numberOfLines={2}>
-                    {todo.title}
-                </Text>
+        <View style={styles.rowContainer}>
+            <View style={styles.row}>
+                <Pressable
+                    onPress={() => onToggle(todo.id, todo.project)}
+                    style={[styles.checkbox, todo.compleded && styles.on]}
+                    accessibilityRole='checkbox'
+                    accessibilityState={{ checked: todo.compleded }}
+                ></Pressable>
+                <View>
+                    <Text style={[styles.title, todo.compleded && styles.done]} numberOfLines={2}>
+                        {todo.title}
+                    </Text>
+                </View>
             </View>
             <Pressable onPress={() => onDelete(todo.id, todo.project)} style={styles.delete}>
                 <Text style={styles.deleteText}>x</Text>
@@ -32,12 +34,16 @@ export default function TodoRow({
 }
 
 const styles = StyleSheet.create({
-    row: {
+    rowContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    row: {
+        paddingHorizontal: 20,
         alignItems: 'center',
         gap: 10,
-        paddingHorizontal: 16,
         paddingVertical: 10,
+        flexDirection: 'row',
     },
     checkbox: {
         width: 22,
@@ -52,6 +58,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
+        justifyContent: 'flex-start',
     },
     done: {
         color: '#777',
@@ -65,6 +72,7 @@ const styles = StyleSheet.create({
     delete: {
         padding: 6,
         marginLeft: 8,
+        justifyContent: 'flex-end',
     },
     deleteText: {
         color: '#c62828',
