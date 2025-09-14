@@ -18,16 +18,14 @@ export default function TodoRow({
                 style={[styles.checkbox, todo.compleded && styles.on]}
                 accessibilityRole='checkbox'
                 accessibilityState={{ checked: todo.compleded }}
-            >
-                <View style={{ flex: 1 }}>
-                    <Text style={[styles.title, todo.compleded && styles.done]} numberOfLines={2}>
-                        {todo.title}
-                    </Text>
-                    {!!todo.project && <Text style={styles.project}>{todo.project}</Text>}
-                </View>
-                <Pressable onPress={() => onDelete(todo.id, todo.project)} style={styles.delete}>
-                    <Text style={styles.deleteText}>x</Text>
-                </Pressable>
+            ></Pressable>
+            <View style={{ flex: 1 }}>
+                <Text style={[styles.title, todo.compleded && styles.done]} numberOfLines={2}>
+                    {todo.title}
+                </Text>
+            </View>
+            <Pressable onPress={() => onDelete(todo.id, todo.project)} style={styles.delete}>
+                <Text style={styles.deleteText}>x</Text>
             </Pressable>
         </View>
     );
