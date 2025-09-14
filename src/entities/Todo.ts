@@ -6,7 +6,7 @@ export class Todo {
         public readonly title: string,
         public readonly project: string,
         public readonly description: string,
-        public readonly dueDate: string,
+        public readonly dueDate: string | null,
         public readonly priority: Priority,
         public readonly compleded: boolean
     ) {}
