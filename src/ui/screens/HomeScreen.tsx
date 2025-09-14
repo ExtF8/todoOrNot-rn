@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     input: {
+        width: '50%',
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
