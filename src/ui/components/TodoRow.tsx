@@ -35,11 +35,12 @@ export default function TodoRow({
 
 const styles = StyleSheet.create({
     rowContainer: {
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingHorizontal: 20,
     },
     row: {
-        paddingHorizontal: 20,
         alignItems: 'center',
         gap: 10,
         paddingVertical: 10,
