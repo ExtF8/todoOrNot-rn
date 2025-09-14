@@ -1,20 +1,32 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storageKeys } from './storageKeys';
-import { ToDo } from '../types/types';
+import { Project } from '../entities/Project';
 
-export async function loadTodos(): Promise<ToDo[]> {
+export async function loadProjects(): Promise<Project[]> {
     try {
-        const todos = await AsyncStorage.getItem(storageKeys.TODOS_V1);
+        const raw = await AsyncStorage.getItem(storageKeys.PROJECTS_V1);
 
-        if (!todos) {
+        if (!raw) {
             return [];
         }
 
-        const parsedTodos = JSON.parse(todos);
+        const parsedProjects = JSON.parse(raw);
 
-        return Array.isArray(parsedTodos) ? (parsedTodos as ToDo[]) : [];
+        if (!Array.isArray(parsedProjects)) {
+            return [];
+        }
+        return parsedProjects.map(Project.fromJSON); // Rehydrate to classes
     } catch (error) {
         console.error('Loading todos failed: ', error);
         return [];
+    }
+}
+
+export async function saveProjects(projects: Project[]): Promise<void> {
+    try {
+        const serialize = projects.map(project => project.toJSON());
+        await AsyncStorage.setItem(storageKeys.PROJECTS_V1, JSON.stringify(serialize));
+    } catch (error) {
+        console.error('saveProjects failed', error);
     }
 }
