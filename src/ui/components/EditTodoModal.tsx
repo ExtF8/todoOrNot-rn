@@ -50,7 +50,6 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
                 <View style={styles.card}>
                     <Text style={styles.header}>Edit Task</Text>
 
-                    {/* Title */}
                     <Text style={styles.label}>Title</Text>
                     <TextInput
                         value={title}
@@ -59,12 +58,11 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
                         style={styles.input}
                     />
 
-                    {/* Description */}
                     <Text style={styles.label}>Description</Text>
                     <TextInput
                         value={description}
                         onChangeText={setDescription}
-                        placeholder='What is this about?'
+                        placeholder='Todo what?'
                         multiline
                         style={[styles.input, styles.multiline]}
                     />
@@ -124,7 +122,6 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
                         </Pressable>
                     </View>
 
-                    {/* Actions */}
                     <View style={styles.actionsRow}>
                         {onDelete && (
                             <Pressable onPress={onDelete} style={[styles.actionBtn, styles.delete]}>
@@ -149,7 +146,7 @@ const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.35)',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
     },
     card: {
         backgroundColor: '#fff',
