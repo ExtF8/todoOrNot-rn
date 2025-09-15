@@ -23,6 +23,63 @@ export class Todo {
         );
     }
 
+    rename(newTitle: string): Todo {
+        const trimmedTitle = newTitle.trim();
+        if (trimmedTitle.length === 0) {
+            return this;
+        }
+        return new Todo(
+            this.id,
+            trimmedTitle,
+            this.project,
+            this.description,
+            this.dueDate,
+            this.priority,
+            !this.compleded
+        );
+    }
+
+    update(fields: {
+        title?: string;
+        description?: string;
+        dueDate?: string | null;
+        priority?: Priority;
+        completed?: boolean;
+    }): Todo {
+        let newTitle = this.title;
+        let newDescription = this.description;
+        let newDueDate = this.dueDate;
+        let newPriority = this.priority;
+        let newCompleted = this.compleded;
+
+        if (fields.title !== undefined) {
+            newTitle = fields.title;
+        }
+        if (fields.description !== undefined) {
+            newDescription = fields.description;
+        }
+        if (fields.dueDate !== undefined) {
+            newDueDate = fields.dueDate;
+        }
+        if (fields.priority !== undefined) {
+            newPriority = fields.priority;
+        }
+        if (fields.completed !== undefined) {
+            newCompleted = fields.completed;
+        }
+
+        // Return new Todo instance with updated values
+        return new Todo(
+            this.id,
+            newTitle,
+            this.project,
+            newDescription,
+            newDueDate,
+            newPriority,
+            newCompleted
+        );
+    }
+
     // ymd: year, month, day
     setDueDate(ymd: string): Todo {
         return new Todo(
