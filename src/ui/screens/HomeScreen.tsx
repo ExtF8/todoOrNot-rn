@@ -8,11 +8,13 @@ export default function HomeScreen({
     onAdd,
     onToggle,
     onDelete,
+    onEdit,
 }: {
     todos: Todo[];
     onAdd: (title: string) => void;
     onToggle: (id: number, projectName: string) => void;
     onDelete: (id: number, projectName: string) => void;
+    onEdit?: (todo: Todo) => void;
 }) {
     const [text, setText] = useState('');
 
@@ -43,7 +45,7 @@ export default function HomeScreen({
                 data={todos}
                 keyExtractor={todo => String(todo.id)}
                 renderItem={({ item }) => (
-                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} />
+                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} onEdit={onEdit} />
                 )}
                 ItemSeparatorComponent={() => <View style={styles.seperator} />}
                 contentContainerStyle={todos.length === 0 ? styles.center : undefined}

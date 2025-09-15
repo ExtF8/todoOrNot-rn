@@ -7,10 +7,12 @@ export default function WeekScreen({
     todos,
     onToggle,
     onDelete,
+    onEdit,
 }: {
     todos: Todo[];
     onToggle: (id: number, projectName: string) => void;
     onDelete: (id: number, projectName: string) => void;
+    onEdit?: (todo: Todo) => void;
 }) {
     return (
         <View style={{ flex: 1 }}>
@@ -21,7 +23,7 @@ export default function WeekScreen({
                     <View style={{ height: 1, backgroundColor: '#eee', marginLeft: 16 }} />
                 )}
                 renderItem={({ item }) => (
-                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} />
+                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} onEdit={onEdit} />
                 )}
                 contentContainerStyle={
                     todos.length === 0

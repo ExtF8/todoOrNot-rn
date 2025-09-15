@@ -6,16 +6,21 @@ export default function TodoRow({
     todo,
     onToggle,
     onDelete,
+    onEdit,
 }: {
     todo: Todo;
     onToggle: (id: number, projectName: string) => void;
     onDelete: (id: number, projectName: string) => void;
+    onEdit?: (todo: Todo) => void;
 }) {
+    const handleToggle = () => onToggle(todo.id, todo.project);
+    const handleDelete = () => onDelete(todo.id, todo.project);
+    const handleEdit = () => onEdit && onEdit(todo);
     return (
         <View style={styles.rowContainer}>
             <View style={styles.row}>
                 <Pressable
-                    onPress={() => onToggle(todo.id, todo.project)}
+                    onPress={handleToggle}
                     style={[styles.checkbox, todo.compleded && styles.on]}
                     accessibilityRole='checkbox'
                     accessibilityState={{ checked: todo.compleded }}
@@ -26,9 +31,20 @@ export default function TodoRow({
                     </Text>
                 </View>
             </View>
-            <Pressable onPress={() => onDelete(todo.id, todo.project)} style={styles.delete}>
-                <Text style={styles.deleteText}>x</Text>
-            </Pressable>
+            <View style={styles.editContainer}>
+                <Pressable
+                    onPress={handleEdit}
+                    style={styles.editButton}
+                    hitSlop={8}
+                    accessibilityRole='button'
+                    accessibilityLabel='Edit task'
+                >
+                    <Text style={styles.editText}>Edit</Text>
+                </Pressable>
+                <Pressable onPress={handleDelete} style={styles.delete}>
+                    <Text style={styles.deleteText}>x</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -65,10 +81,23 @@ const styles = StyleSheet.create({
         color: '#777',
         textDecorationLine: 'line-through',
     },
-    project: {
-        color: '#666',
-        fontSize: 12,
-        marginTop: 2,
+    editContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    editButton: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+    },
+    editText: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#111827',
     },
     delete: {
         padding: 6,

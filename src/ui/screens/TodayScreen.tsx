@@ -7,10 +7,12 @@ export default function TodayScreen({
     todos,
     onToggle,
     onDelete,
+    onEdit,
 }: {
     todos: Todo[];
     onToggle: (id: number, projectName: string) => void;
     onDelete: (id: number, projectName: string) => void;
+    onEdit?: (todo: Todo) => void;
 }) {
     return (
         <View>
@@ -18,7 +20,7 @@ export default function TodayScreen({
                 data={todos}
                 keyExtractor={todo => String(todo.id)}
                 renderItem={({ item }) => (
-                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} />
+                    <TodoRow todo={item} onToggle={onToggle} onDelete={onDelete} onEdit={onEdit} />
                 )}
                 ItemSeparatorComponent={() => (
                     <View style={{ height: 1, backgroundColor: '#eee', marginLeft: 16 }} />
