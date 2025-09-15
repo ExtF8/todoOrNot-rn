@@ -6,11 +6,13 @@ import { Todo } from './src/entities/Todo';
 import { isDueToday, isDueThisWeek } from './src/services/filters';
 import { loadProjects, saveProjects } from './src/storage/projectStorage';
 import { getSeedProjects } from './src/sampleData/sampleData';
-import TabBar, { Tab } from './src/ui/components/TabBar';
+import TabBar from './src/ui/components/TabBar';
 import HomeScreen from './src/ui/screens/HomeScreen';
 import TodayScreen from './src/ui/screens/TodayScreen';
 import WeekScreen from './src/ui/screens/WeekScreen';
 import ProjectsScreen from './src/ui/screens/ProjectsScreen';
+import EditTodoModal from './src/ui/components/EditTodoModal';
+import type { Priority } from './src/entities/Todo';
 
 // Create ids for todos
 function createId(): number {
@@ -20,6 +22,8 @@ function createId(): number {
 export default function App() {
     const [activeTab, setActiveTab] = useState<'Home' | 'Today' | 'Week' | 'Projects'>('Home');
     const [projects, setProjects] = useState<Project[]>([]);
+    const [editorVisible, setEditorVisible] = useState(false);
+    const [selected, setSelected] = useState<{ id: number; projectName: string } | null>(null);
 
     // Load projects form storage or seed if empty
     useEffect(() => {
@@ -107,6 +111,50 @@ export default function App() {
         ]);
     }
 
+    /**
+     * Open todo editor modal
+     */
+    function openEditor(todo: Todo) {
+        setSelected({ id: todo.id, projectName: todo.project });
+        setEditorVisible(true);
+    }
+
+    const selectedTodo: Todo | null = useMemo(() => {
+        if (!selected) return null;
+        for (const project of projects) {
+            if (project.name !== selected.projectName) continue;
+            const found = project.todos.find(t => t.id === selected.id);
+            if (found) return found;
+        }
+        return null;
+    }, [selected, projects]);
+
+    function closeEditor() {
+        setEditorVisible(false);
+        setSelected(null);
+    }
+
+    function saveEdits(changes: {
+        title: string;
+        description: string;
+        dueDate: string | null;
+        priority: Priority;
+        completed: boolean;
+    }) {
+        if (!selected) return;
+        const { id, projectName } = selected;
+
+        setProjects(previousProjects =>
+            previousProjects.map(project =>
+                project.name === projectName
+                    ? project.mapTodo(id, todo => todo.update(changes))
+                    : project
+            )
+        );
+
+        closeEditor();
+    }
+
     return (
         <View style={styles.container}>
             <StatusBar style='auto' />
@@ -117,7 +165,6 @@ export default function App() {
             <TabBar active={activeTab} onChange={setActiveTab}></TabBar>
 
             <View style={{ flex: 1 }}>
-
                 {activeTab === 'Home' && (
                     <HomeScreen
                         todos={allTodos}
@@ -128,6 +175,7 @@ export default function App() {
                         }}
                         onToggle={toggleTodo}
                         onDelete={confirmDelete}
+                        onEdit={openEditor}
                     />
                 )}
 
@@ -136,15 +184,37 @@ export default function App() {
                         todos={todayTodos}
                         onToggle={toggleTodo}
                         onDelete={confirmDelete}
+                        onEdit={openEditor}
                     />
                 )}
 
                 {activeTab === 'Week' && (
-                    <WeekScreen todos={weekTodos} onToggle={toggleTodo} onDelete={confirmDelete} />
+                    <WeekScreen
+                        todos={weekTodos}
+                        onToggle={toggleTodo}
+                        onDelete={confirmDelete}
+                        onEdit={openEditor}
+                    />
                 )}
 
-                {activeTab === 'Projects' && <ProjectsScreen projects={projects} onSelect={() => setActiveTab("Home")}/>}
+                {activeTab === 'Projects' && (
+                    <ProjectsScreen projects={projects} onSelect={() => setActiveTab('Home')} />
+                )}
             </View>
+            <EditTodoModal
+                visible={editorVisible}
+                todo={selectedTodo}
+                onClose={closeEditor}
+                onSave={saveEdits}
+                onDelete={
+                    selected
+                        ? () => {
+                              confirmDelete(selected.id, selected.projectName);
+                              closeEditor();
+                          }
+                        : undefined
+                }
+            />
         </View>
     );
 }
