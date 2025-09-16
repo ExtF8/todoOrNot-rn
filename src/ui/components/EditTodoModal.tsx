@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
 import { Todo, Priority } from '../../entities/Todo';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 type Props = {
     visible: boolean;
+    mode: 'create' | 'edit';
+    // create new
+    initialTitle?: string;
+    initialProjectId?: number;
+    // picking projects
+    projects: { id: number; name: string }[];
+    // editing
     todo: Todo | null;
     onClose: () => void;
-    onSave: (changes: {
+    onSave: (payload: {
+        projectId: number;
         title: string;
         description: string;
         dueDate: string | null;
@@ -16,26 +25,54 @@ type Props = {
     onDelete?: () => void;
 };
 
-export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete }: Props) {
+export default function EditTodoModal({
+    visible,
+    mode,
+    initialTitle,
+    initialProjectId,
+    projects,
+    todo,
+    onClose,
+    onSave,
+    onDelete,
+}: Props) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [dueDate, setDueDate] = useState<string | null>(null);
     const [priority, setPriority] = useState<Priority>('medium');
     const [completed, setCompleted] = useState(false);
+    const [projectId, setProjectId] = useState<number | null>(null);
+    const [pickerOpen, setPickerOpen] = useState(false);
 
     useEffect(() => {
-        if (!todo) return;
-        setTitle(todo.title);
-        setDescription(todo.description);
-        setDueDate(todo.dueDate);
-        setPriority(todo.priority);
-        setCompleted(todo.compleded);
-    }, [todo]);
+        if (!visible) return;
+
+        if (mode === 'edit' && todo) {
+            setTitle(todo.title);
+            setDescription(todo.description);
+            setDueDate(todo.dueDate);
+            setPriority(todo.priority);
+            setCompleted(todo.completed);
+            // find project by name
+            const p = projects.find(p => p.name === todo.project);
+            setProjectId(p ? p.id : projects[0]?.id ?? null);
+        } else {
+            setTitle(initialTitle ?? '');
+            setDescription('');
+            setDueDate(null);
+            setPriority('medium');
+            setCompleted(false);
+            setProjectId(initialProjectId ?? projects[0]?.id ?? null);
+        }
+    }, [visible, mode, todo, initialTitle, initialProjectId, projects]);
 
     function handleSave() {
         const cleanTitle = title.trim();
         if (cleanTitle.length === 0) return;
+        if (projectId == null) return;
+
         onSave({
+            projectId,
             title: cleanTitle,
             description: description.trim(),
             dueDate: dueDate && dueDate.trim().length > 0 ? dueDate.trim() : null,
@@ -43,6 +80,13 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
             completed,
         });
     }
+
+    // Priority colors
+    const PRIORITY_COLORS = {
+        low: '#22C55E',
+        medium: '#EAB308',
+        high: '#DC2626',
+    } as const;
 
     return (
         <Modal visible={visible} transparent animationType='slide' onRequestClose={onClose}>
@@ -67,16 +111,19 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
                         style={[styles.input, styles.multiline]}
                     />
 
-                    <Text style={styles.label}>Due date (YYYY-MM-DD)</Text>
+                    <Text style={styles.label}>Due date</Text>
                     <View style={styles.row}>
                         <TextInput
                             value={dueDate ?? ''}
                             onChangeText={txt => setDueDate(txt)}
-                            placeholder='e.g., 2025-09-14'
+                            placeholder='YYYY-MM-DD'
                             style={[styles.input, { flex: 1 }]}
                             autoCapitalize='none'
                             autoCorrect={false}
                         />
+                        <Pressable onPress={() => setPickerOpen(true)} style={styles.clearBtn}>
+                            <Text style={styles.clearBtnText}>Pick</Text>
+                        </Pressable>
                         <Pressable onPress={() => setDueDate(null)} style={styles.clearBtn}>
                             <Text style={styles.clearBtnText}>Clear</Text>
                         </Pressable>
@@ -88,19 +135,39 @@ export default function EditTodoModal({ visible, todo, onClose, onSave, onDelete
                             <Pressable
                                 key={p}
                                 onPress={() => setPriority(p)}
-                                style={[styles.pill, priority === p && styles.pillActive]}
+                                style={[
+                                    styles.pill,
+                                    priority === p && {
+                                        backgroundColor: PRIORITY_COLORS[p],
+                                        borderColor: PRIORITY_COLORS[p],
+                                    },
+                                ]}
                             >
                                 <Text
-                                    style={[
-                                        styles.pillText,
-                                        priority === p && styles.pillTextActive,
-                                    ]}
+                                    style={[styles.pillText, priority === p && { color: '#fff' }]}
                                 >
                                     {p}
                                 </Text>
                             </Pressable>
                         ))}
                     </View>
+
+                    {/* date picker */}
+                    {pickerOpen && (
+                        <DateTimePicker
+                            value={dueDate ? new Date(dueDate) : new Date()}
+                            mode='date'
+                            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                            onChange={(event: DateTimePickerEvent, date?: Date) => {
+                                setPickerOpen(false);
+                                if (event.type === 'set' && date) {
+                                    // store as YYYY-MM-DD
+                                    const yyyyMmDd = date.toISOString().split('T')[0];
+                                    setDueDate(yyyyMmDd);
+                                }
+                            }}
+                        />
+                    )}
 
                     <Text style={styles.label}>Status</Text>
                     <View style={styles.priorityRow}>
