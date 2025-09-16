@@ -8,7 +8,7 @@ export class Todo {
         public readonly description: string,
         public readonly dueDate: string | null,
         public readonly priority: Priority,
-        public readonly compleded: boolean
+        public readonly completed: boolean
     ) {}
 
     toggle(): Todo {
@@ -19,7 +19,7 @@ export class Todo {
             this.description,
             this.dueDate,
             this.priority,
-            !this.compleded
+            !this.completed
         );
     }
 
@@ -35,7 +35,7 @@ export class Todo {
             this.description,
             this.dueDate,
             this.priority,
-            !this.compleded
+            !this.completed
         );
     }
 
@@ -50,7 +50,7 @@ export class Todo {
         let newDescription = this.description;
         let newDueDate = this.dueDate;
         let newPriority = this.priority;
-        let newCompleted = this.compleded;
+        let newCompleted = this.completed;
 
         if (fields.title !== undefined) {
             newTitle = fields.title;
@@ -89,7 +89,7 @@ export class Todo {
             this.description,
             ymd,
             this.priority,
-            this.compleded
+            this.completed
         );
     }
 
@@ -101,7 +101,7 @@ export class Todo {
             this.description,
             this.dueDate,
             priority,
-            this.compleded
+            this.completed
         );
     }
 
@@ -113,7 +113,7 @@ export class Todo {
             description: this.description,
             dueDate: this.dueDate,
             priority: this.priority,
-            compleded: this.compleded,
+            completed: this.completed,
         };
     }
 
@@ -125,7 +125,7 @@ export class Todo {
             String(raw.description ?? ''),
             String(raw.dueDate ?? ''),
             (raw.priority as Priority) ?? 'medium',
-            Boolean(raw.compleded)
+            Boolean(raw.completed)
         );
     }
 }
