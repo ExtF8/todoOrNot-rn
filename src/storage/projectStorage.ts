@@ -4,7 +4,7 @@ import { Project } from '../entities/Project';
 
 export async function loadProjects(): Promise<Project[]> {
     try {
-        const raw = await AsyncStorage.getItem(storageKeys.PROJECTS_V1);
+        const raw = await AsyncStorage.getItem(storageKeys.PROJECTS_V2);
 
         if (!raw) {
             return [];
@@ -25,7 +25,7 @@ export async function loadProjects(): Promise<Project[]> {
 export async function saveProjects(projects: Project[]): Promise<void> {
     try {
         const serialize = projects.map(project => project.toJSON());
-        await AsyncStorage.setItem(storageKeys.PROJECTS_V1, JSON.stringify(serialize));
+        await AsyncStorage.setItem(storageKeys.PROJECTS_V2, JSON.stringify(serialize));
     } catch (error) {
         console.error('saveProjects failed', error);
     }
