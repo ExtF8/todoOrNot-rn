@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TextInput, Pressable, StyleSheet, Platform } from 'react-native';
+import {
+    Modal,
+    View,
+    Text,
+    TextInput,
+    Pressable,
+    KeyboardAvoidingView,
+    StyleSheet,
+    ScrollView,
+    Platform,
+} from 'react-native';
 import { Todo, Priority } from '../../entities/Todo';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
@@ -89,122 +99,136 @@ export default function EditTodoModal({
     } as const;
 
     return (
-        <Modal visible={visible} transparent animationType='slide' onRequestClose={onClose}>
-            <View style={styles.backdrop}>
-                <View style={styles.card}>
-                    <Text style={styles.header}>Edit Task</Text>
+        <Modal visible={visible} transparent animationType='fade' onRequestClose={onClose}>
+            <KeyboardAvoidingView
+                style={{ flex: 1, }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                keyboardVerticalOffset={-100}
+            >
+                <View style={styles.backdrop}>
+                    <View style={styles.card}>
+                        <Text style={styles.header}>Edit Todo</Text>
 
-                    <Text style={styles.label}>Title</Text>
-                    <TextInput
-                        value={title}
-                        onChangeText={setTitle}
-                        placeholder='Task title'
-                        style={styles.input}
-                    />
-
-                    <Text style={styles.label}>Description</Text>
-                    <TextInput
-                        value={description}
-                        onChangeText={setDescription}
-                        placeholder='Todo what?'
-                        multiline
-                        style={[styles.input, styles.multiline]}
-                    />
-
-                    <Text style={styles.label}>Due date</Text>
-                    <View style={styles.row}>
+                        <Text style={styles.label}>Title</Text>
                         <TextInput
-                            value={dueDate ?? ''}
-                            onChangeText={txt => setDueDate(txt)}
-                            placeholder='YYYY-MM-DD'
-                            style={[styles.input, { flex: 1 }]}
-                            autoCapitalize='none'
-                            autoCorrect={false}
+                            value={title}
+                            onChangeText={setTitle}
+                            placeholder='Task title'
+                            style={styles.input}
                         />
-                        <Pressable onPress={() => setPickerOpen(true)} style={styles.clearBtn}>
-                            <Text style={styles.clearBtnText}>Pick</Text>
-                        </Pressable>
-                        <Pressable onPress={() => setDueDate(null)} style={styles.clearBtn}>
-                            <Text style={styles.clearBtnText}>Clear</Text>
-                        </Pressable>
-                    </View>
 
-                    <Text style={styles.label}>Priority</Text>
-                    <View style={styles.priorityRow}>
-                        {(['low', 'medium', 'high'] as Priority[]).map(p => (
+                        <Text style={styles.label}>Description</Text>
+                        <TextInput
+                            value={description}
+                            onChangeText={setDescription}
+                            placeholder='Todo what?'
+                            multiline
+                            style={[styles.input, styles.multiline]}
+                        />
+
+                        <Text style={styles.label}>Due date</Text>
+                        <View style={styles.row}>
+                            <TextInput
+                                value={dueDate ?? ''}
+                                onChangeText={txt => setDueDate(txt)}
+                                placeholder='YYYY-MM-DD'
+                                style={[styles.input, { flex: 1 }]}
+                                autoCapitalize='none'
+                                autoCorrect={false}
+                            />
+                            <Pressable onPress={() => setPickerOpen(true)} style={styles.clearBtn}>
+                                <Text style={styles.clearBtnText}>Pick</Text>
+                            </Pressable>
+                            <Pressable onPress={() => setDueDate(null)} style={styles.clearBtn}>
+                                <Text style={styles.clearBtnText}>Clear</Text>
+                            </Pressable>
+                        </View>
+
+                        <Text style={styles.label}>Priority</Text>
+                        <View style={styles.priorityRow}>
+                            {(['low', 'medium', 'high'] as Priority[]).map(p => (
+                                <Pressable
+                                    key={p}
+                                    onPress={() => setPriority(p)}
+                                    style={[
+                                        styles.pill,
+                                        priority === p && {
+                                            backgroundColor: PRIORITY_COLORS[p],
+                                            borderColor: PRIORITY_COLORS[p],
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.pillText,
+                                            priority === p && { color: '#fff' },
+                                        ]}
+                                    >
+                                        {p}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+
+                        {/* date picker */}
+                        {pickerOpen && (
+                            <DateTimePicker
+                                value={dueDate ? new Date(dueDate) : new Date()}
+                                mode='date'
+                                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                                onChange={(event: DateTimePickerEvent, date?: Date) => {
+                                    setPickerOpen(false);
+                                    if (event.type === 'set' && date) {
+                                        // store as YYYY-MM-DD
+                                        const yyyyMmDd = date.toISOString().split('T')[0];
+                                        setDueDate(yyyyMmDd);
+                                    }
+                                }}
+                            />
+                        )}
+
+                        <Text style={styles.label}>Status</Text>
+                        <View style={styles.priorityRow}>
                             <Pressable
-                                key={p}
-                                onPress={() => setPriority(p)}
-                                style={[
-                                    styles.pill,
-                                    priority === p && {
-                                        backgroundColor: PRIORITY_COLORS[p],
-                                        borderColor: PRIORITY_COLORS[p],
-                                    },
-                                ]}
+                                onPress={() => setCompleted(false)}
+                                style={[styles.pill, !completed && styles.pillActive]}
                             >
                                 <Text
-                                    style={[styles.pillText, priority === p && { color: '#fff' }]}
+                                    style={[styles.pillText, !completed && styles.pillTextActive]}
                                 >
-                                    {p}
+                                    Open
                                 </Text>
                             </Pressable>
-                        ))}
-                    </View>
-
-                    {/* date picker */}
-                    {pickerOpen && (
-                        <DateTimePicker
-                            value={dueDate ? new Date(dueDate) : new Date()}
-                            mode='date'
-                            display={Platform.OS === 'ios' ? 'inline' : 'default'}
-                            onChange={(event: DateTimePickerEvent, date?: Date) => {
-                                setPickerOpen(false);
-                                if (event.type === 'set' && date) {
-                                    // store as YYYY-MM-DD
-                                    const yyyyMmDd = date.toISOString().split('T')[0];
-                                    setDueDate(yyyyMmDd);
-                                }
-                            }}
-                        />
-                    )}
-
-                    <Text style={styles.label}>Status</Text>
-                    <View style={styles.priorityRow}>
-                        <Pressable
-                            onPress={() => setCompleted(false)}
-                            style={[styles.pill, !completed && styles.pillActive]}
-                        >
-                            <Text style={[styles.pillText, !completed && styles.pillTextActive]}>
-                                Open
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            onPress={() => setCompleted(true)}
-                            style={[styles.pill, completed && styles.pillActive]}
-                        >
-                            <Text style={[styles.pillText, completed && styles.pillTextActive]}>
-                                Done
-                            </Text>
-                        </Pressable>
-                    </View>
-
-                    <View style={styles.actionsRow}>
-                        {onDelete && (
-                            <Pressable onPress={onDelete} style={[styles.actionBtn, styles.delete]}>
-                                <Text style={styles.actionTextDelete}>Delete</Text>
+                            <Pressable
+                                onPress={() => setCompleted(true)}
+                                style={[styles.pill, completed && styles.pillActive]}
+                            >
+                                <Text style={[styles.pillText, completed && styles.pillTextActive]}>
+                                    Done
+                                </Text>
                             </Pressable>
-                        )}
-                        <View style={{ flex: 1 }} />
-                        <Pressable onPress={onClose} style={[styles.actionBtn, styles.cancel]}>
-                            <Text style={styles.actionText}>Cancel</Text>
-                        </Pressable>
-                        <Pressable onPress={handleSave} style={[styles.actionBtn, styles.save]}>
-                            <Text style={styles.actionTextSave}>Save</Text>
-                        </Pressable>
+                        </View>
+
+                        <View style={styles.actionsRow}>
+                            {onDelete && (
+                                <Pressable
+                                    onPress={onDelete}
+                                    style={[styles.actionBtn, styles.delete]}
+                                >
+                                    <Text style={styles.actionTextDelete}>Delete</Text>
+                                </Pressable>
+                            )}
+                            <View style={{ flex: 1 }} />
+                            <Pressable onPress={onClose} style={[styles.actionBtn, styles.cancel]}>
+                                <Text style={styles.actionText}>Cancel</Text>
+                            </Pressable>
+                            <Pressable onPress={handleSave} style={[styles.actionBtn, styles.save]}>
+                                <Text style={styles.actionTextSave}>Save</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         </Modal>
     );
 }
