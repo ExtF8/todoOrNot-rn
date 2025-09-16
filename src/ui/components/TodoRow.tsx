@@ -21,12 +21,12 @@ export default function TodoRow({
             <View style={styles.row}>
                 <Pressable
                     onPress={handleToggle}
-                    style={[styles.checkbox, todo.compleded && styles.on]}
+                    style={[styles.checkbox, todo.completed && styles.on]}
                     accessibilityRole='checkbox'
-                    accessibilityState={{ checked: todo.compleded }}
+                    accessibilityState={{ checked: todo.completed }}
                 ></Pressable>
                 <View>
-                    <Text style={[styles.title, todo.compleded && styles.done]} numberOfLines={2}>
+                    <Text style={[styles.title, todo.completed && styles.done]} numberOfLines={2}>
                         {todo.title}
                     </Text>
                 </View>
