@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TextInput, Pressable, Text, FlatList, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Pressable, Text, FlatList, StyleSheet } from 'react-native';
 import { Todo } from '../../entities/Todo';
 import TodoRow from '../components/TodoRow';
 
@@ -16,28 +16,15 @@ export default function HomeScreen({
     onDelete: (id: number, projectName: string) => void;
     onEdit?: (todo: Todo) => void;
 }) {
-    const [text, setText] = useState('');
-
     function addTodo() {
-        const title = text.trim();
-        if (title.length === 0) {
-            return;
-        }
-        onAdd(title);
-        setText('');
+        onAdd('');
     }
 
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.row}>
-                <TextInput
-                    style={styles.input}
-                    value={text}
-                    onChangeText={setText}
-                    placeholder='Add todo or not...'
-                />
                 <Pressable style={styles.addButton} onPress={addTodo}>
-                    <Text style={styles.addText}>Add</Text>
+                    <Text style={styles.addText}>Add New</Text>
                 </Pressable>
             </View>
 
@@ -62,23 +49,16 @@ const styles = StyleSheet.create({
         padding: 16,
         justifyContent: 'center',
     },
-    input: {
-        width: '50%',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        fontSize: 16,
-    },
     addButton: {
         paddingHorizontal: 14,
+        paddingVertical: 16,
         justifyContent: 'center',
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#333',
     },
     addText: {
+        fontSize: 16,
         fontWeight: '700',
     },
     center: {
