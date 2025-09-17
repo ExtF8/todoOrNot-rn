@@ -1,3 +1,3 @@
 export const storageKeys = {
-    PROJECTS_V2: 'todoOrNot.projects.v2',
+    PROJECTS_V1: 'todoOrNot.projects.v1',
 } as const;
