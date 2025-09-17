@@ -111,7 +111,7 @@ export default function EditTodoModal({
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={-100}
+                keyboardVerticalOffset={-50}
             >
                 <View style={styles.backdrop}>
                     <View style={styles.card}>
