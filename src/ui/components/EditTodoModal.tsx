@@ -64,8 +64,8 @@ export default function EditTodoModal({
             setPriority(todo.priority);
             setCompleted(todo.completed);
             // find project by name
-            const p = projects.find(p => p.name === todo.project);
-            setProjectId(p ? p.id : projects[0]?.id ?? null);
+            const projectFound = projects.find(project => project.name === todo.project);
+            setProjectId(projectFound ? projectFound.id : projects[0]?.id ?? null);
         } else {
             setTitle(initialTitle ?? '');
             setDescription('');
@@ -98,16 +98,52 @@ export default function EditTodoModal({
         high: '#DC2626',
     } as const;
 
+    // current project name for dynamic header
+    const currentProjectName =
+        (projectId != null
+            ? projects.find(project => project.id === projectId)?.name
+            : undefined) ??
+        (mode === 'edit' && todo ? todo.project : undefined) ??
+        '';
+
     return (
         <Modal visible={visible} transparent animationType='fade' onRequestClose={onClose}>
             <KeyboardAvoidingView
-                style={{ flex: 1, }}
+                style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 keyboardVerticalOffset={-100}
             >
                 <View style={styles.backdrop}>
                     <View style={styles.card}>
-                        <Text style={styles.header}>Edit Todo</Text>
+                        {/* Dynamic header */}
+                        <Text style={styles.header}>
+                            {mode === 'edit'
+                                ? `Edit Todo — ${currentProjectName}`
+                                : `New Todo${currentProjectName ? ` — ${currentProjectName}` : ''}`}
+                        </Text>
+
+                        <Text style={styles.label}>Project</Text>
+                        <View style={styles.projectsRow}>
+                            {projects.map(project => {
+                                const isSelected = projectId === project.id;
+                                return (
+                                    <Pressable
+                                        key={project.id}
+                                        onPress={() => setProjectId(project.id)}
+                                        style={[styles.pill, isSelected && styles.pillActive]}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.pillText,
+                                                isSelected && styles.pillTextActive,
+                                            ]}
+                                        >
+                                            {project.name}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
 
                         <Text style={styles.label}>Title</Text>
                         <TextInput
@@ -130,7 +166,7 @@ export default function EditTodoModal({
                         <View style={styles.row}>
                             <TextInput
                                 value={dueDate ?? ''}
-                                onChangeText={txt => setDueDate(txt)}
+                                onChangeText={text => setDueDate(text)}
                                 placeholder='YYYY-MM-DD'
                                 style={[styles.input, { flex: 1 }]}
                                 autoCapitalize='none'
@@ -146,41 +182,40 @@ export default function EditTodoModal({
 
                         <Text style={styles.label}>Priority</Text>
                         <View style={styles.priorityRow}>
-                            {(['low', 'medium', 'high'] as Priority[]).map(p => (
+                            {(['low', 'medium', 'high'] as Priority[]).map(priorityOption => (
                                 <Pressable
-                                    key={p}
-                                    onPress={() => setPriority(p)}
+                                    key={priorityOption}
+                                    onPress={() => setPriority(priorityOption)}
                                     style={[
                                         styles.pill,
-                                        priority === p && {
-                                            backgroundColor: PRIORITY_COLORS[p],
-                                            borderColor: PRIORITY_COLORS[p],
+                                        priority === priorityOption && {
+                                            backgroundColor: PRIORITY_COLORS[priorityOption],
+                                            borderColor: PRIORITY_COLORS[priorityOption],
                                         },
                                     ]}
                                 >
                                     <Text
                                         style={[
                                             styles.pillText,
-                                            priority === p && { color: '#fff' },
+                                            priority === priorityOption && { color: '#fff' },
                                         ]}
                                     >
-                                        {p}
+                                        {priorityOption}
                                     </Text>
                                 </Pressable>
                             ))}
                         </View>
 
-                        {/* date picker */}
                         {pickerOpen && (
                             <DateTimePicker
                                 value={dueDate ? new Date(dueDate) : new Date()}
                                 mode='date'
                                 display={Platform.OS === 'ios' ? 'inline' : 'default'}
-                                onChange={(event: DateTimePickerEvent, date?: Date) => {
+                                onChange={(event: DateTimePickerEvent, chosenDate?: Date) => {
                                     setPickerOpen(false);
-                                    if (event.type === 'set' && date) {
+                                    if (event.type === 'set' && chosenDate) {
                                         // store as YYYY-MM-DD
-                                        const yyyyMmDd = date.toISOString().split('T')[0];
+                                        const yyyyMmDd = chosenDate.toISOString().split('T')[0];
                                         setDueDate(yyyyMmDd);
                                     }
                                 }}
@@ -256,6 +291,11 @@ const styles = StyleSheet.create({
         color: '#374151',
         fontSize: 13,
     },
+    projectsRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+    },
     input: {
         borderWidth: 1,
         borderColor: '#E5E7EB',
@@ -286,7 +326,6 @@ const styles = StyleSheet.create({
         color: '#374151',
         fontWeight: '600',
     },
-
     priorityRow: {
         flexDirection: 'row',
         gap: 8,
