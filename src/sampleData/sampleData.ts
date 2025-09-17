@@ -1,7 +1,7 @@
 import { Project } from '../entities/Project';
 import { Todo } from '../entities/Todo';
 
-// Sample data to load
+// Sample data for first load
 const sampleData = {
     projects: [
         {
@@ -169,18 +169,46 @@ function ymd(date: Date): string {
 }
 
 /**
- * Adjusts the due dates of todos in the sample data to distribute them evenly across the current week.
- * The week starts on Monday.
+ * Mutates the given projects' todos so that:
+ * - Up to 3 todos per project are due today
+ * - Remaining todos are spread one per day starting tomorrow
+ * - Total window: today and next 13 days (14 days)
  */
+function adjustDueDatesToIncludeCurrentDay(projects: Project[]): void {
+    const totalDays = 14; // today and next 13 days
+
+    // normalize "today" to local midnight
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (const project of projects) {
+        const count = project.todos.length;
+
+        // first up to 3 todos -> today
+        const todaysCount = Math.min(3, count);
+        for (let i = 0; i < todaysCount; i++) {
+            project.todos[i] = project.todos[i].setDueDate(ymd(today));
+        }
+
+        // spread the rest starting from tomorrow
+        const currentDay = new Date(today);
+        currentDay.setDate(currentDay.getDate() + 1);
+
+        let todoIndex = todaysCount;
+        for (let dayOffset = 1; dayOffset < totalDays && todoIndex < count; dayOffset++) {
+            // assign date (clone to avoid aliasing)
+            const assignDate = new Date(currentDay);
+            project.todos[todoIndex] = project.todos[todoIndex].setDueDate(ymd(assignDate));
+            todoIndex++;
+
+            // advance one day
+            currentDay.setDate(currentDay.getDate() + 1);
+        }
+    }
+}
+
 export function getSeedProjects(): Project[] {
-    // Get current date and normalize to start of the day
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    // Set up the total number of days (current week + next week)
-    const totalDays = 14;
-
-    // Convert plain objects into Project/Todo class instances
+    // build class instances
     const projects = sampleData.projects.map(
         project =>
             new Project(
@@ -193,7 +221,7 @@ export function getSeedProjects(): Project[] {
                             todo.title,
                             todo.project,
                             todo.description,
-                            todo.dueDate,
+                            todo.dueDate, // will be overwritten below
                             todo.priority as any,
                             todo.completed
                         )
@@ -201,35 +229,8 @@ export function getSeedProjects(): Project[] {
             )
     );
 
-    // 4. Iterate over projects and assign due dates
-    for (const project of projects) {
-        const totalTodos = project.todos.length;
-
-        // Assign some todos to today (up to 3)
-        const todosForToday = Math.min(3, totalTodos);
-        for (let i = 0; i < todosForToday; i++) {
-            project.todos[i] = project.todos[i].setDueDate(ymd(currentDate));
-        }
-
-        // Start date reference for spreading remaining todos
-        let currentDay = new Date(currentDate);
-
-        // Distribute the rest across the next 13 days
-        let currentTodoIndex = todosForToday;
-        for (let dayOffset = 1; dayOffset < totalDays; dayOffset++) {
-            if (currentTodoIndex >= totalTodos) break;
-
-            // Create a new Date for this offset
-            const dueDate = new Date(currentDay);
-            project.todos[currentTodoIndex] = project.todos[currentTodoIndex].setDueDate(
-                ymd(dueDate)
-            );
-            currentTodoIndex++;
-
-            // Increment day reference for next loop
-            currentDay.setDate(currentDay.getDate() + 1);
-        }
-    }
-
+    // adjust due dates (local and correct spread)
+    adjustDueDatesToIncludeCurrentDay(projects);
+    console.log('Samle data:', projects);
     return projects;
 }
