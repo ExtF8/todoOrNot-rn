@@ -268,7 +268,9 @@ export default function App() {
                 {activeTab === 'Projects' && (
                     <ProjectsScreen
                         projects={projects}
-                        onSelect={() => setActiveTab('Home')} // TODO: switch to ProjectDetailScreen
+                        onToggle={toggleTodo}
+                        onDelete={confirmDelete}
+                        onEdit={openEditor}
                     />
                 )}
             </View>
@@ -302,6 +304,8 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'flex-start',
         paddingTop: 30,
+        marginBottom: 30
+
     },
     header: {
         alignItems: 'center',
