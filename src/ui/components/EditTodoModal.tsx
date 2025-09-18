@@ -7,7 +7,6 @@ import {
     Pressable,
     KeyboardAvoidingView,
     StyleSheet,
-    ScrollView,
     Platform,
 } from 'react-native';
 import { Todo, Priority } from '../../entities/Todo';
@@ -130,7 +129,11 @@ export default function EditTodoModal({
                                     <Pressable
                                         key={project.id}
                                         onPress={() => setProjectId(project.id)}
-                                        style={[styles.pill, isSelected && styles.pillActive]}
+                                        style={({ pressed }) => [
+                                            styles.pill,
+                                            isSelected && styles.pillActive,
+                                            pressed && styles.pressed,
+                                        ]}
                                     >
                                         <Text
                                             style={[
@@ -172,10 +175,22 @@ export default function EditTodoModal({
                                 autoCapitalize='none'
                                 autoCorrect={false}
                             />
-                            <Pressable onPress={() => setPickerOpen(true)} style={styles.clearBtn}>
+                            <Pressable
+                                onPress={() => setPickerOpen(true)}
+                                style={({ pressed }) => [
+                                    styles.clearBtn,
+                                    pressed && styles.pressed,
+                                ]}
+                            >
                                 <Text style={styles.clearBtnText}>Pick</Text>
                             </Pressable>
-                            <Pressable onPress={() => setDueDate(null)} style={styles.clearBtn}>
+                            <Pressable
+                                onPress={() => setDueDate(null)}
+                                style={({ pressed }) => [
+                                    styles.clearBtn,
+                                    pressed && styles.pressed,
+                                ]}
+                            >
                                 <Text style={styles.clearBtnText}>Clear</Text>
                             </Pressable>
                         </View>
@@ -248,16 +263,34 @@ export default function EditTodoModal({
                             {onDelete && (
                                 <Pressable
                                     onPress={onDelete}
-                                    style={[styles.actionBtn, styles.delete]}
+                                    style={({ pressed }) => [
+                                        styles.actionBtn,
+                                        styles.delete,
+                                        pressed && styles.pressed,
+                                    ]}
                                 >
                                     <Text style={styles.actionTextDelete}>Delete</Text>
                                 </Pressable>
                             )}
                             <View style={{ flex: 1 }} />
-                            <Pressable onPress={onClose} style={[styles.actionBtn, styles.cancel]}>
+                            <Pressable
+                                onPress={onClose}
+                                style={({ pressed }) => [
+                                    styles.actionBtn,
+                                    styles.cancel,
+                                    pressed && styles.pressed,
+                                ]}
+                            >
                                 <Text style={styles.actionText}>Cancel</Text>
                             </Pressable>
-                            <Pressable onPress={handleSave} style={[styles.actionBtn, styles.save]}>
+                            <Pressable
+                                onPress={handleSave}
+                                style={({ pressed }) => [
+                                    styles.actionBtn,
+                                    styles.save,
+                                    pressed && styles.pressed,
+                                ]}
+                            >
                                 <Text style={styles.actionTextSave}>Save</Text>
                             </Pressable>
                         </View>
@@ -385,5 +418,8 @@ const styles = StyleSheet.create({
     actionTextDelete: {
         color: '#DC2626',
         fontWeight: '700',
+    },
+    pressed: {
+        opacity: 0.5,
     },
 });

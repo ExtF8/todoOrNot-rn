@@ -23,7 +23,10 @@ export default function HomeScreen({
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.row}>
-                <Pressable style={styles.addButton} onPress={addTodo}>
+                <Pressable
+                    style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}
+                    onPress={addTodo}
+                >
                     <Text style={styles.addText}>Add New</Text>
                 </Pressable>
             </View>
@@ -70,5 +73,8 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#eee',
         marginLeft: 16,
+    },
+    pressed: {
+        opacity: 0.5,
     },
 });

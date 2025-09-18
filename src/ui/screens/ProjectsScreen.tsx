@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, Platform } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { Project } from '../../entities/Project';
 import { Todo } from '../../entities/Todo';
 import TodoRow from '../components/TodoRow';
@@ -30,15 +30,11 @@ export default function ProjectsScreen({
                     <Pressable
                         onPress={() => setSelectedProjectId(null)}
                         style={({ pressed }) => [styles.navBtn, pressed && styles.pressed]}
-                        android_ripple={
-                            Platform.OS === 'android' ? { color: '#E5E7EB' } : undefined
-                        }
                     >
                         <Text style={styles.navBtnText}>Back</Text>
                     </Pressable>
                     <Text style={styles.headerTitle}>{selectedProject.name}</Text>
                     <View style={{ width: 64 }} />
-                    {/* spacer to balance Back */}
                 </View>
 
                 <FlatList
@@ -73,9 +69,6 @@ export default function ProjectsScreen({
                     <Pressable
                         onPress={() => setSelectedProjectId(item.id)}
                         style={({ pressed }) => [styles.projectRow, pressed && styles.pressed]}
-                        android_ripple={
-                            Platform.OS === 'android' ? { color: '#E5E7EB' } : undefined
-                        }
                     >
                         <Text style={styles.projectName}>{item.name}</Text>
                         <Text style={styles.count}>{item.todos.length}</Text>

@@ -18,7 +18,11 @@ export default function TabBar({
                 <Pressable
                     key={tab}
                     onPress={() => onChange(tab)}
-                    style={[styles.tab, active === tab && styles.active]}
+                    style={({ pressed }) => [
+                        styles.tab,
+                        active === tab && styles.active,
+                        pressed && styles.pressed,
+                    ]}
                 >
                     <Text style={[styles.text, active === tab && styles.textActive]}>{tab}</Text>
                 </Pressable>
@@ -51,5 +55,8 @@ const styles = StyleSheet.create({
     },
     textActive: {
         color: '#fff',
+    },
+    pressed: {
+        opacity: 0.5,
     },
 });
