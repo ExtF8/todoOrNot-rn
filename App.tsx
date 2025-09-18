@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'flex-start',
         paddingTop: 30,
-        marginBottom: 30
+        paddingBottom: 30
 
     },
     header: {
