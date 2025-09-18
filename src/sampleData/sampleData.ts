@@ -205,6 +205,7 @@ function adjustDueDatesToIncludeCurrentDay(projects: Project[]): void {
             currentDay.setDate(currentDay.getDate() + 1);
         }
     }
+    console.log('adjust');
 }
 
 export function getSeedProjects(): Project[] {
@@ -231,6 +232,6 @@ export function getSeedProjects(): Project[] {
 
     // adjust due dates (local and correct spread)
     adjustDueDatesToIncludeCurrentDay(projects);
-    console.log('Samle data:', projects);
+
     return projects;
 }
