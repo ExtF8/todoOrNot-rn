@@ -1,4 +1,4 @@
-# 📋 ToDo or Not (React Native Demo)
+# ToDo or Not (React Native Demo)
 
 A simple **To-Do list demo app** built with **React Native**, **Expo**, and **TypeScript**.  
 The app is inspired by the original [todoOrNot (web version)](https://github.com/ExtF8/todoOrNot) and reimagined for mobile.
