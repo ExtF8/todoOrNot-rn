@@ -1,6 +1,12 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { Todo } from '../../entities/Todo';
+
+const PRIORITY_COLORS = {
+    low: '#22C55E',
+    medium: '#EAB308',
+    high: '#DC2626',
+} as const;
 
 export default function TodoRow({
     todo,
@@ -16,74 +22,95 @@ export default function TodoRow({
     const handleToggle = () => onToggle(todo.id, todo.project);
     const handleDelete = () => onDelete(todo.id, todo.project);
     const handleEdit = () => onEdit && onEdit(todo);
+
     return (
-        <View style={styles.rowContainer}>
-            <View style={styles.row}>
-                <Pressable
-                    onPress={handleToggle}
-                    style={[styles.checkbox, todo.completed && styles.on]}
-                    accessibilityRole='checkbox'
-                    accessibilityState={{ checked: todo.completed }}
-                ></Pressable>
-                <View>
-                    <Text style={[styles.title, todo.completed && styles.done]} numberOfLines={2}>
-                        {todo.title}
-                    </Text>
-                </View>
+        <View style={styles.row}>
+            <Pressable
+                onPress={handleToggle}
+                style={({ pressed }) => [
+                    styles.checkbox,
+                    todo.completed && styles.on,
+                    pressed && styles.pressed,
+                ]}
+                accessibilityRole='checkbox'
+                accessibilityState={{ checked: todo.completed }}
+                hitSlop={8}
+            />
+
+            <View style={[styles.dot, { backgroundColor: PRIORITY_COLORS[todo.priority] }]} />
+
+            <View style={styles.textWrap}>
+                <Text style={[styles.title, todo.completed && styles.done]} numberOfLines={2}>
+                    {todo.title}
+                </Text>
+                {!!todo.project && <Text style={styles.projectName}>{todo.project}</Text>}
             </View>
-            <View style={styles.editContainer}>
-                <Pressable
-                    onPress={handleEdit}
-                    style={styles.editButton}
-                    hitSlop={8}
-                    accessibilityRole='button'
-                    accessibilityLabel='Edit task'
-                >
-                    <Text style={styles.editText}>Edit</Text>
-                </Pressable>
-                <Pressable onPress={handleDelete} style={styles.delete}>
-                    <Text style={styles.deleteText}>x</Text>
-                </Pressable>
-            </View>
+
+            <Pressable
+                onPress={handleEdit}
+                style={({ pressed }) => [styles.editButton, pressed && styles.pressed]}
+                hitSlop={8}
+                accessibilityRole='button'
+                accessibilityLabel='Edit task'
+            >
+                <Text style={styles.editText}>Edit</Text>
+            </Pressable>
+            <Pressable
+                onPress={handleDelete}
+                style={({ pressed }) => [styles.deleteBtn, pressed && styles.pressed]}
+                hitSlop={8}
+                accessibilityRole='button'
+                accessibilityLabel='Delete task'
+            >
+                <Text style={styles.deleteText}>✕</Text>
+            </Pressable>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    rowContainer: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 30,
-    },
     row: {
-        alignItems: 'center',
-        gap: 10,
-        paddingVertical: 10,
         flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        gap: 12,
+        minHeight: 56,
     },
     checkbox: {
         width: 22,
         height: 22,
-        borderRadius: 4,
+        borderRadius: 6,
         borderWidth: 2,
-        borderColor: '#888',
+        borderColor: '#9CA3AF',
+        backgroundColor: 'transparent',
     },
     on: {
-        backgroundColor: '#4CAF50',
-        borderColor: '#4CAF50',
+        backgroundColor: '#22C55E',
+        borderColor: '#22C55E',
+    },
+    dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+    },
+    textWrap: {
+        flex: 1,
+        justifyContent: 'center',
     },
     title: {
         fontSize: 16,
-        justifyContent: 'flex-start',
+        lineHeight: 22,
+        color: '#111827',
     },
     done: {
         color: '#777',
         textDecorationLine: 'line-through',
     },
-    editContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    projectName: {
+        marginTop: 2,
+        fontSize: 12,
+        color: '#9CA3AF',
     },
     editButton: {
         paddingHorizontal: 10,
@@ -92,20 +119,22 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#D1D5DB',
         backgroundColor: '#fff',
-        justifyContent: 'center',
     },
     editText: {
         fontSize: 13,
         fontWeight: '700',
         color: '#111827',
     },
-    delete: {
+    deleteBtn: {
         padding: 6,
-        marginLeft: 8,
-        justifyContent: 'flex-end',
+        marginLeft: 6,
+        borderRadius: 8,
     },
     deleteText: {
-        color: '#c62828',
-        fontSize: 16,
+        fontSize: 18,
+        color: '#DC2626',
+    },
+    pressed: {
+        opacity: 0.5,
     },
 });
